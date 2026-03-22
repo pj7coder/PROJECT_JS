@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tell Us About Yourself</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function () {
+            const t = localStorage.getItem("website_theme") || "dark";
+            const b = localStorage.getItem("website_bg") || "ocean";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-bg", b);
+            const cb = localStorage.getItem("website_custom_bg");
+            if (b === "custom" && cb) {
+                document.documentElement.style.setProperty("--custom-bg-image", `url('${cb}')`);
+            }
+        })();
+    </script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <div class="bg-layer" id="bgLayer"></div>
+
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+
+    <main class="auth-container qual-main-container">
+        <header class="auth-header qual-header">
+            <h1 data-i18n="qual_heading">Tell Us About Yourself <span class="qual-optional-text">(Optional)</span></h1>
+            <p class="qual-subheading" data-i18n="qual_subheading">You can skip this and
+                complete later.</p>
+        </header>
+
+        <div class="auth-card glass qual-card">
+            <div class="qual-scroll-content">
+
+                <div class="step-indicator" id="qualStepIndicator">
+                    <span class="step dot active"></span>
+                    <span class="step line" id="line1"></span>
+                    <span class="step dot" id="dot2"></span>
+                    <span class="step line" id="line2"></span>
+                    <span class="step dot" id="dot3"></span>
+                    <span class="step line" id="line3"></span>
+                    <span class="step dot" id="dot4"></span>
+                    <span class="step line" id="line4"></span>
+                    <span class="step dot final-dot" id="dot5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" class="tick hidden">
+                            <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2.12-1.15V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
+                                </svg>
+                                Academic Background
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group">
+                                    <label>10th Percentage</label>
+                                    <input type="text" placeholder="e.g. 95%">
+                                </div>
+                                <div class="input-group">
+                                    <label>12th Percentage</label>
+                                    <input type="text" placeholder="e.g. 92%">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>College Name</label>
+                                    <input type="text" placeholder="Enter your college">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Degree</label>
+                                    <input type="text" placeholder="e.g. B.Tech Computer Science">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Marksheet Upload</label>
+                                    <div class="file-drop-area hidden-input-container">
+                                        <span class="drop-text">Drag & drop marksheet or click to browse</span>
+                                        <input type="file" class="hidden-file-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z" />
+                                </svg>
+                                Skills & Interests
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Skills <span class="helper-text">- e.g. Python, React</span></label>
+                                    <input type="text" placeholder="Start typing to add skills...">
+                                </div>
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Interests & Hobbies <span class="helper-text">- e.g. AI, Open Source,
+                                            Photography</span></label>
+                                    <input type="text" placeholder="Start typing your interests...">
+                                </div>
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>What type of job do you want? <span class="helper-text">- e.g. Full Stack
+                                            Developer, Legal Advisor</span></label>
+                                    <input type="text" placeholder="Enter job title">
+                                </div>
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Preferred Location</label>
+                                    <input type="text" placeholder="e.g. Bangalore, Delhi NCR">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Certifications Upload</label>
+                                    <div class="file-drop-area hidden-input-container">
+                                        <span class="drop-text">Drag & drop certificates or click to browse</span>
+                                        <input type="file" class="hidden-file-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z" />
+                                </svg>
+                                Experience
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2">
+                                    <label>Internship / Work</label>
+                                    <textarea placeholder="Briefly describe your roles" rows="3"
+                                        class="char-limited-textarea"></textarea>
+                                    <div class="char-count">0 / 300</div>
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Projects</label>
+                                    <textarea placeholder="Key projects you've built" rows="3"
+                                        class="char-limited-textarea"></textarea>
+                                    <div class="char-count">0 / 300</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                                </svg>
+                                Resume and Portfolio
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2">
+                                    <label>Resume Upload</label>
+                                    <div class="file-drop-area upload-box hidden-input-container">
+                                        <svg viewBox="0 0 24 24" width="32" height="32" class="qual-upload-icon">
+                                            <path fill="currentColor"
+                                                d="M9 16h6v-6h4l-7-7-7 7h4v6zm3-10.17L14.59 8H13v8h-2V8H9.41L12 5.83zM5 18h14v2H5v-2z" />
+                                        </svg>
+                                        <span class="drop-text">Drag & drop your resume (PDF/DOCX)</span>
+                                        <span class="file-name-preview qual-filename-preview"
+                                            style="display:none;"></span>
+                                        <input type="file" class="hidden-file-input" accept=".pdf,.doc,.docx">
+                                    </div>
+                                </div>
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Portfolio / LinkedIn URL</label>
+                                    <input type="url" placeholder="https://">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <div class="qual-action-buttons">
+                    <button type="button" class="btn-secondary" id="skipBtn"
+                        onclick="window.location.href='index.html'">Skip for Now</button>
+                    <button type="button" class="btn-primary" id="saveQualBtn"
+                        onclick="window.location.href='index.html'">Save & Continue</button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

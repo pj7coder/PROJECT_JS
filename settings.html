@@ -1,0 +1,132 @@
+<!-- Universal Settings Overlay – shared across all pages -->
+<div id="settingsOverlay" aria-modal="true" role="dialog">
+    <div class="settings-sidebar">
+        <h3 style="margin-bottom: 1.5rem; padding-left: 1.2rem; opacity: 0.9; letter-spacing: 1px;">SETTINGS</h3>
+        <div class="sett-tab active" data-tab="general">General</div>
+        <div class="sett-tab" data-tab="themes">Themes</div>
+        <div class="sett-tab" data-tab="languages">Languages</div>
+        <div class="sett-tab" data-tab="personalization">Personalization</div>
+        <div class="sett-tab" data-tab="account">Account</div>
+        <div class="sett-tab" data-tab="help">Help</div>
+    </div>
+    <div class="settings-main">
+        <button id="settingsClose" aria-label="Close settings">
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+            </svg>
+        </button>
+        <div id="pane-general" class="sett-pane active">
+            <h2>General Settings</h2>
+            <p>Manage your core application preferences here.</p>
+        </div>
+        <div id="pane-themes" class="sett-pane">
+            <h2>Themes</h2>
+            <div class="sett-section">
+                <h4>UI Mode</h4>
+                <div class="themes-grid core-themes">
+                    <button type="button" class="theme-tile core-tile" data-theme="light">
+                        <div class="color-preview" style="background: #ffffff; border: 1px solid #ccc;"></div>
+                        <span>Light</span>
+                    </button>
+                    <button type="button" class="theme-tile core-tile active" data-theme="dark">
+                        <div class="color-preview" style="background: #0f172a; border: 1px solid #334155;"></div>
+                        <span>Dark</span>
+                    </button>
+                </div>
+            </div>
+            <div class="sett-section" style="margin-top: 2rem;">
+                <h4>Background</h4>
+                <div class="themes-grid bg-themes">
+                    <button type="button" class="theme-tile bg-tile active" data-bg="ocean">
+                        <div class="color-preview" style="background-image: url('preview_images/ocean.webp');"></div>
+                        <span>Ocean</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="aurora">
+                        <div class="color-preview" style="background-image: url('preview_images/aurora.webp');"></div>
+                        <span>Aurora</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="mountain">
+                        <div class="color-preview" style="background-image: url('preview_images/mountain.webp');"></div>
+                        <span>Mountain</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="snowmountain">
+                        <div class="color-preview" style="background-image: url('preview_images/snowmountain.webp');">
+                        </div>
+                        <span>Snow Mountain</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="grassland">
+                        <div class="color-preview" style="background-image: url('preview_images/grassland.webp');">
+                        </div>
+                        <span>Grassland</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="desert">
+                        <div class="color-preview" style="background-image: url('preview_images/desert.webp');"></div>
+                        <span>Desert</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="forest">
+                        <div class="color-preview" style="background-image: url('preview_images/forest.webp');"></div>
+                        <span>Forest</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="citynight">
+                        <div class="color-preview" style="background-image: url('preview_images/citynight.webp');">
+                        </div>
+                        <span>City Night</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="sunset">
+                        <div class="color-preview" style="background-image: url('preview_images/sunset.webp');"></div>
+                        <span>Sunset</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="galaxy">
+                        <div class="color-preview" style="background-image: url('preview_images/galaxy.webp');"></div>
+                        <span>Galaxy</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="none">
+                        <div class="color-preview"
+                            style="background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; border: 1px dashed rgba(255,255,255,0.2);">
+                            <svg viewBox="0 0 24 24" width="20" height="20" style="opacity: 0.5;">
+                                <path fill="currentColor"
+                                    d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-1.85.63-3.56 1.69-4.9L16.9 18.31C15.56 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.44 4.63 10.15 4 12 4c4.41 0 8 3.59 8 8 0 1.85-.63 3.56-1.69 4.9z" />
+                            </svg>
+                        </div>
+                        <span>None</span>
+                    </button>
+                    <button type="button" class="theme-tile bg-tile" data-bg="custom" id="customBgBtn">
+                        <div class="color-preview"
+                            style="background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.15); background-size: cover; background-position: center;"
+                            id="customBgPreview">
+                            <svg viewBox="0 0 24 24" width="22" height="22" style="opacity: 0.7;">
+                                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+                            </svg>
+                        </div>
+                        <span>Custom</span>
+                    </button>
+                    <input type="file" id="customBgInput" accept="image/*" style="display:none">
+                </div>
+            </div>
+        </div>
+        <div id="pane-languages" class="sett-pane">
+            <h2>Languages</h2>
+            <div class="lang-grid">
+                <button class="lang-tile active" data-lang="en"><span>English</span></button>
+                <button class="lang-tile" data-lang="hi"><span>हिन्दी (Hindi)</span></button>
+                <button class="lang-tile" data-lang="ta"><span>தமிழ் (Tamil)</span></button>
+                <button class="lang-tile" data-lang="te"><span>తెలుగు (Telugu)</span></button>
+                <button class="lang-tile" data-lang="mr"><span>मराठी (Marathi)</span></button>
+                <button class="lang-tile" data-lang="bn"><span>বাংলা (Bengali)</span></button>
+            </div>
+        </div>
+        <div id="pane-personalization" class="sett-pane">
+            <h2>Personalization</h2>
+            <p>Tailor the AI recommendations to your career goals.</p>
+        </div>
+        <div id="pane-account" class="sett-pane">
+            <h2>Account</h2>
+            <p>Update your profile and security settings.</p>
+        </div>
+        <div id="pane-help" class="sett-pane">
+            <h2>Help &amp; Support</h2>
+            <p>Contact our team or read the documentation.</p>
+        </div>
+    </div>
+</div>

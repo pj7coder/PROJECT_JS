@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Sarthi - Your AI-Powered Career Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        (function () {
+            const t = localStorage.getItem("website_theme") || "dark";
+            const b = localStorage.getItem("website_bg") || "ocean";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-bg", b);
+
+            // Flicker prevention: hide BG layer initially if we need to load from IDB
+            if (b === "custom") {
+                document.documentElement.classList.add("bg-preparing");
+                const req = indexedDB.open('JobSarthiDB', 1);
+                req.onsuccess = () => {
+                    const db = req.result;
+                    if (!db.objectStoreNames.contains('backgrounds')) {
+                        document.documentElement.classList.remove("bg-preparing");
+                        return;
+                    }
+                    const tx = db.transaction('backgrounds', 'readonly');
+                    const get = tx.objectStore('backgrounds').get('custom_bg');
+                    get.onsuccess = () => {
+                        const blob = get.result;
+                        if (blob instanceof Blob) {
+                            const url = URL.createObjectURL(blob);
+                            document.documentElement.style.setProperty("--custom-bg-image", `url('${url}')`);
+                            // Small delay to ensure browser has applied the property
+                            setTimeout(() => {
+                                document.documentElement.classList.remove("bg-preparing");
+                            }, 50);
+                        } else {
+                            document.documentElement.classList.remove("bg-preparing");
+                        }
+                    };
+                    get.onerror = () => document.documentElement.classList.remove("bg-preparing");
+                };
+                req.onerror = () => document.documentElement.classList.remove("bg-preparing");
+            }
+        })();
+    </script>
+    <script src="script.js" defer></script>
+
+    <script defer>
+        document.addEventListener("DOMContentLoaded", async () => {
+
+            // ── Header glassmorphism & Logo Link ───────────────────────────
+            const headerEl = document.getElementById("mainHeader");
+            window.addEventListener("scroll", () => {
+                headerEl.classList.toggle("scrolled", window.scrollY > 20);
+            });
+
+            const brandLogo = document.querySelector(".header-left .brand-logo");
+            if (brandLogo) {
+                brandLogo.style.cursor = "pointer";
+                brandLogo.addEventListener("click", () => {
+                    gsap.to(".landing-hero, #sarthiFloatWrap", {
+                        opacity: 0,
+                        y: 20,
+                        duration: 0.5,
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            window.location.href = "about.html";
+                        }
+                    });
+                });
+            }
+
+            // ── Loading Sequence Logic ────────────────────────────────────
+            const loadingScreen = document.getElementById("loading-screen");
+            const loaderContent = document.querySelector(".loader-content");
+            const loaderLogo = document.querySelector(".loader-logo");
+            const loaderLogoImg = loaderLogo.querySelector("img");
+            const loaderTextWrap = document.querySelector(".loader-text-wrap");
+            const loaderText = document.querySelector(".loader-text");
+            const loaderUnderline = document.querySelector(".loader-underline");
+            const mainHeaderBrand = document.querySelector(".header-left .brand-logo");
+
+            // Prevent scroll while loading
+            document.body.classList.add("loading");
+            window.scrollTo(0, 0);
+
+            // Pre-measure the real header brand position (temporarily reveal it)
+            gsap.set(mainHeaderBrand, { visibility: "visible", opacity: 0 });
+            const headerBrandRect = mainHeaderBrand.getBoundingClientRect();
+            gsap.set(mainHeaderBrand, { visibility: "hidden", opacity: 0 });
+
+            // Set initial states
+            gsap.set(loaderLogo, { scale: 0, opacity: 0 });
+            gsap.set(loaderText, { opacity: 0, x: -30 });
+            gsap.set(loaderUnderline, { width: 0 });
+
+            // ── GSAP Timeline Sequence (Approx 2s) ──
+            const MOVE_DURATION = 0.8;
+            const MOVE_EASE = "power3.inOut";
+
+            const loaderTl = gsap.timeline({
+                onComplete: () => {
+                    document.body.classList.remove("loading");
+                    document.body.classList.add("page-loaded");
+                }
+            });
+
+            // 1. Logo pop in at center
+            loaderTl.to(loaderLogo, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" })
+
+                // 2. Name "Job Sarthi" slides in
+                .to(loaderText, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, "-=0.15")
+
+                // 3. Underline animation
+                .to(loaderUnderline, { width: "100%", duration: 0.3, ease: "power2.inOut" }, "-=0.15")
+
+                // 4. Moderate pause
+                .to({}, { duration: 0.3 })
+
+                // 5. Shift to fixed position
+                .call(() => {
+                    const rect = loaderContent.getBoundingClientRect();
+                    loadingScreen.style.display = "block";
+                    loaderContent.style.position = "fixed";
+                    loaderContent.style.top = rect.top + "px";
+                    loaderContent.style.left = rect.left + "px";
+                    loaderContent.style.margin = "0";
+                })
+
+                // 6. Rapidly hide underline
+                .to(loaderUnderline, {
+                    height: 0, opacity: 0, marginTop: 0,
+                    duration: 0.15, ease: "power2.in"
+                })
+
+                // 7. Move to corner
+                .to(loaderContent, {
+                    top: headerBrandRect.top,
+                    left: headerBrandRect.left,
+                    duration: MOVE_DURATION,
+                    ease: MOVE_EASE,
+                })
+
+                // 8. Snap to finish: Instantly show real brand and remove loader
+                .call(() => {
+                    gsap.set(mainHeaderBrand, { opacity: 1, visibility: "visible" });
+                    loadingScreen.remove();
+                });
+
+            // ── IntersectionObserver for .animate-on-scroll ───────────────
+            const obs = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll(".animate-on-scroll").forEach(el => obs.observe(el));
+
+            // ==============================================================
+            //  SARTHI FLOATING BUTTON → FULL-SCREEN GLASSMORPHISM EXPAND
+            //  Clean click-based approach (no ScrollTrigger pinning bugs)
+            //
+            //  Flow:
+            //  1. SARTHI button sits fixed in bottom-right (like a chat widget)
+            //  2. User clicks → overlay animates from button position → full screen
+            //  3. Inner content (cards + display) fades in after expand
+            //  4. Close button reverses the animation back to button
+            // ==============================================================
+
+            const sarthiBtn = document.getElementById("sarthiBtn");
+            const floatWrap = document.getElementById("sarthiFloatWrap");
+            const overlay = document.getElementById("sarthiOverlay");
+            const glassBox = document.getElementById("sarthiGlassBox");   // Stage 1 content
+            const fullInner = document.getElementById("sarthiGlassInner"); // Stage 2 content
+            const ovHeading = document.getElementById("sarthiOvHeading");
+
+            // ── State ─────────────────────────────────────────────────────
+            // 0 = button  |  1 = glass box  |  2 = full screen
+            let stage = 0;
+
+            // ── Snap overlay to button (hidden) ───────────────────────────
+            function snapToBtn() {
+                const r = sarthiBtn.getBoundingClientRect();
+                gsap.set(overlay, {
+                    position: "fixed", top: r.top, left: r.left,
+                    width: r.width, height: r.height,
+                    borderRadius: "50px", opacity: 0, zIndex: 300,
+                    pointerEvents: "none", background: "var(--accent)",
+                    backdropFilter: "blur(0px)", border: "none", boxShadow: "none",
+                });
+                gsap.set([glassBox, fullInner, ovHeading], { autoAlpha: 0 });
+            }
+            snapToBtn();
+            window.addEventListener("resize", () => { if (stage === 0) snapToBtn(); });
+
+            // ── Consolidated Animation Sync (Interruptible) ───────────────
+            function syncSarthiStage(target) {
+                if (target === stage) return;
+                const prev = stage;
+                stage = target;
+
+                // Elements to hide when overlay is active
+                const headerEl = document.getElementById("mainHeader");
+                const heroEl = document.querySelector(".landing-hero");
+
+                // Stop all previous tweens on these elements to prevent conflicts
+                gsap.killTweensOf([overlay, glassBox, fullInner, ovHeading, floatWrap, headerEl, heroEl]);
+
+                if (target > 0) {
+                    // Hide main page elements when any overlay stage is active
+                    gsap.to([headerEl, heroEl], { autoAlpha: 0, y: -20, duration: 0.3, ease: "power2.inOut", overwrite: true });
+                } else {
+                    // Show main page elements when back to button
+                    gsap.to([headerEl, heroEl], { autoAlpha: 1, y: 0, duration: 0.4, delay: 0.1, ease: "power2.out", overwrite: true });
+                }
+
+                if (target === 1) {
+                    // Stage 1: Glass Box (Speed: 0.25s)
+                    glassBox.style.pointerEvents = "auto";
+                    fullInner.style.pointerEvents = "none";
+                    gsap.to(floatWrap, { autoAlpha: 0, scale: 0.9, duration: 0.15, ease: "power2.in", overwrite: true });
+                    gsap.to(overlay, {
+                        opacity: 1, top: "50%", left: "50%",
+                        xPercent: -50, yPercent: -50,
+                        width: 660, height: 420,
+                        borderRadius: "28px",
+                        background: "linear-gradient(135deg,rgba(255,255,255,0.12) 0%,rgba(255,255,255,0.04) 100%)",
+                        backdropFilter: "blur(32px)", webkitBackdropFilter: "blur(32px)",
+                        boxShadow: "0 28px 70px rgba(0,0,0,0.6),inset 0 1px 1px rgba(255,255,255,0.18)",
+                        border: "1px solid rgba(255,255,255,0.16)",
+                        duration: 0.25, ease: "power3.out",
+                        overwrite: true,
+                        onComplete: () => { overlay.style.pointerEvents = "auto"; }
+                    });
+                    gsap.to(glassBox, { autoAlpha: 1, y: 0, scale: 1, duration: 0.2, delay: 0.05, ease: "power2.out", overwrite: true });
+                    gsap.to([fullInner, ovHeading], { autoAlpha: 0, y: 10, duration: 0.15, ease: "power2.in", overwrite: true });
+                }
+                else if (target === 2) {
+                    // Stage 2: Full Screen (Speed: 0.3s)
+                    glassBox.style.pointerEvents = "none";
+                    fullInner.style.pointerEvents = "auto";
+                    gsap.to(floatWrap, { autoAlpha: 0, scale: 0.9, duration: 0.15, ease: "power2.in", overwrite: true });
+                    gsap.to(glassBox, { autoAlpha: 0, y: -10, scale: 0.98, duration: 0.15, ease: "power2.in", overwrite: true });
+                    gsap.to(overlay, {
+                        opacity: 1,
+                        top: 0, left: 0, xPercent: 0, yPercent: 0,
+                        width: "100vw", height: "100vh",
+                        borderRadius: "0px",
+                        background: "linear-gradient(160deg,rgba(5,5,14,0.97) 0%,rgba(12,6,26,0.95) 100%)",
+                        backdropFilter: "blur(48px)", webkitBackdropFilter: "blur(48px)",
+                        boxShadow: "none", border: "none",
+                        duration: 0.3, ease: "expo.out",
+                        overwrite: true,
+                        onComplete: () => { overlay.style.pointerEvents = "auto"; }
+                    });
+                    gsap.fromTo(ovHeading,
+                        { autoAlpha: 0, y: -5, scale: 0.95 },
+                        { autoAlpha: 1, y: 0, scale: 1, duration: 0.2, delay: 0.1, ease: "power2.out", overwrite: true }
+                    );
+                    gsap.fromTo(fullInner,
+                        { autoAlpha: 0, y: 15 },
+                        { autoAlpha: 1, y: 0, duration: 0.25, delay: 0.12, ease: "power2.out", overwrite: true }
+                    );
+                }
+                else if (target === 0) {
+                    // Stage 0: Back to button (Speed: 0.3s)
+                    overlay.style.pointerEvents = "none";
+                    glassBox.style.pointerEvents = "none";
+                    fullInner.style.pointerEvents = "none";
+                    gsap.to([glassBox, fullInner, ovHeading], { autoAlpha: 0, y: 5, duration: 0.15, ease: "power2.in", overwrite: true });
+
+                    const r = sarthiBtn.getBoundingClientRect();
+                    gsap.to(overlay, {
+                        top: r.top, left: r.left,
+                        xPercent: 0, yPercent: 0,
+                        width: r.width, height: r.height,
+                        borderRadius: "50px",
+                        background: "var(--accent)",
+                        opacity: 0,
+                        duration: 0.3, ease: "power3.inOut",
+                        overwrite: true,
+                        onComplete: () => {
+                            snapToBtn();
+                            gsap.to(floatWrap, { autoAlpha: 1, scale: 1, duration: 0.2, ease: "back.out(1.5)", overwrite: true });
+                        }
+                    });
+                }
+            }
+
+            // ── Scroll Event Driver (with Hysteresis/Buffer) ──────────────
+            const VH = () => window.innerHeight;
+            window.addEventListener("scroll", () => {
+                const sy = window.scrollY;
+                const zone1 = VH() * 0.2;   // Faster opening (was 0.7)
+                const zone2 = VH() * 0.7;   // Faster expansion (was 1.8)
+                const zone3 = VH() * 1.6;   // New threshold to collapse/close
+                const buf = 25;             // 25px buffer to prevent jitter
+
+                let targetStage = stage; // Default to current
+
+                // Hysteresis logic with new zone3:
+                if (sy >= zone3) {
+                    targetStage = 0; // Close when scrolling further down
+                } else if (sy >= zone2 && sy < zone3 - buf) {
+                    targetStage = 2;
+                } else if (sy >= zone1 && sy < zone2 - buf) {
+                    targetStage = 1;
+                } else if (sy < zone1 - buf) {
+                    targetStage = 0;
+                }
+
+                syncSarthiStage(targetStage);
+            }, { passive: true });
+
+            // Initial sync in case page starts scrolled down
+            setTimeout(() => {
+                const sy = window.scrollY;
+                const v = VH();
+                let initStage = 0;
+                if (sy >= v * 1.6) initStage = 0;
+                else if (sy >= v * 0.7) initStage = 2;
+                else if (sy >= v * 0.2) initStage = 1;
+                syncSarthiStage(initStage);
+            }, 20);
+
+            // ── Button click → chatbot ────────────────────────────────────
+            function playSarthiTransition() {
+                window.location.href = "chatbot.html";
+            }
+
+            const sarthiBtnsTotal = document.querySelectorAll('#sarthiBtn, .nav-item, #sarthiTitleLink');
+            sarthiBtnsTotal.forEach(btn => {
+                const text = btn.innerText || "";
+                if (btn.id === 'sarthiBtn' || btn.id === 'sarthiTitleLink' || text.trim().includes('Sarthi')) {
+                    btn.addEventListener("click", (e) => {
+                        if (btn.tagName === 'A' || btn.id === 'sarthiBtn' || btn.id === 'sarthiTitleLink') e.preventDefault();
+                        playSarthiTransition();
+                    });
+                }
+            });
+
+            // ── Settings (loaded from shared settings.html + settings.js) ──
+            await loadSettingsHTML();
+            initSettings(document.querySelector(".settings-btn"));
+
+            // ── Feature card switching + 3D tilt ─────────────────────────
+
+            document.querySelectorAll(".feature-card").forEach(card => {
+                card.addEventListener("click", () => {
+                    document.querySelectorAll(".feature-card").forEach(c => c.classList.remove("active"));
+                    document.querySelectorAll(".display-content").forEach(d => d.classList.remove("active"));
+                    card.classList.add("active");
+                    const tgt = document.getElementById("display-" + card.dataset.feature);
+                    if (tgt) tgt.classList.add("active");
+                });
+
+                card.addEventListener("mousemove", e => {
+                    const rc = card.getBoundingClientRect();
+                    const rx = ((e.clientY - (rc.top + rc.height / 2)) / rc.height) * 10;
+                    const ry = ((e.clientX - (rc.left + rc.width / 2)) / rc.width) * -10;
+                    gsap.to(card, {
+                        rotateX: rx, rotateY: ry, translateZ: 14,
+                        transformPerspective: 900, duration: 0.3
+                    });
+                });
+                card.addEventListener("mouseleave", () => {
+                    gsap.to(card, {
+                        rotateX: 0, rotateY: 0, translateZ: 0,
+                        duration: 0.6, ease: "elastic.out(1, 0.5)"
+                    });
+                });
+            });
+        });
+    </script>
+    <style>
+        /* Speed up ALL sarthi-themed buttons & unify animations */
+        .btn-sarthi,
+        .sarthi-title-link,
+        .nav-item[href*="Sarthi"],
+        #mainHeader .nav-item:nth-child(3) {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        #sarthiBtn,
+        #sarthiFloatWrap .btn-sarthi {
+            animation: sarthiFloatVerySlow 8s ease-in-out infinite 0.5s !important;
+        }
+
+        @keyframes sarthiFloatVerySlow {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-2px);
+            }
+        }
+
+        .sarthi-title-link {
+            color: var(--accent);
+            background: none;
+            border: none;
+            font: inherit;
+            padding: 0;
+            cursor: pointer;
+            transition: transform 0.2s, text-shadow 0.2s, color 0.2s;
+            display: inline-block;
+        }
+
+        .sarthi-title-link:hover {
+            color: #fff !important;
+            text-shadow: 0 0 20px var(--accent);
+            transform: scale(1.1);
+        }
+
+        /* ── Settings Overlay Morph System ── */
+        #settingsOverlay {
+            position: fixed;
+            z-index: 1000;
+            display: none;
+            /* Controlled by JS morph */
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            flex-direction: row;
+            color: #fff;
+        }
+
+        [data-theme="light"] #settingsOverlay {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.5) 100%);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.1);
+            color: #000;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-sidebar {
+            width: 240px;
+            background: rgba(0, 0, 0, 0.25);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sett-tab {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 500;
+            color: #fff;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .sett-tab:not(.active):hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .sett-tab.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .sett-tab.active:hover {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+            filter: brightness(1.1);
+        }
+
+        .settings-main {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            position: relative;
+            background: rgba(255, 255, 255, 0.01);
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+        }
+
+        .settings-main::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari and Opera */
+        }
+
+        .landing-page-body {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .landing-page-body::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sett-pane {
+            display: none;
+            animation: settFadeIn 0.3s ease;
+        }
+
+        .sett-pane.active {
+            display: block;
+        }
+
+        @keyframes settFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #settingsClose {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.6rem;
+            color: #fff;
+            opacity: 0.4;
+            transition: all 0.2s;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #settingsClose:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.15);
+            transform: rotate(90deg);
+        }
+
+        [data-theme="light"] #settingsClose {
+            color: #000;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        [data-theme="light"] .sett-tab {
+            color: #000;
+            opacity: 0.7;
+        }
+
+        [data-theme="light"] .sett-tab.active {
+            color: #fff;
+            opacity: 1;
+        }
+
+        [data-theme="light"] .sett-tab:not(.active):hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: #000;
+        }
+
+        [data-theme="light"] .sett-tab.active:hover {
+            background: var(--accent);
+            color: #fff;
+            opacity: 1;
+            filter: brightness(1.1);
+        }
+
+        [data-theme="light"] .settings-main h2 {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            -webkit-text-fill-color: initial;
+            color: #000 !important;
+        }
+
+        .settings-main h2 {
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+
+        [data-theme="light"] .settings-sidebar h3 {
+            opacity: 1;
+            color: #000;
+        }
+
+        .settings-sidebar h3 {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            opacity: 1;
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+            color: #fff;
+        }
+
+        /* Sub-grids inside settings */
+        .themes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .theme-tile {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .theme-tile:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        [data-theme="light"] .theme-tile:hover {
+            background: rgba(0, 0, 0, 0.08) !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .theme-tile.active {
+            border-color: var(--accent);
+            background: rgba(var(--accent-rgb), 0.1);
+        }
+
+        .theme-tile .color-preview {
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .theme-tile span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .lang-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .lang-tile {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.25rem 0.75rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .lang-tile:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        [data-theme="light"] .lang-tile:hover {
+            background: rgba(0, 0, 0, 0.05) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .lang-tile.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        [data-theme="light"] .theme-tile span,
+        [data-theme="light"] .lang-tile span {
+            color: #000 !important;
+        }
+
+        .lang-tile span {
+            font-size: 0.85rem;
+        }
+
+        [data-theme="light"] .sett-section h4 {
+            color: #000 !important;
+            opacity: 1;
+        }
+
+        .sett-section h4 {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            color: #fff;
+            opacity: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body class="landing-page-body loading">
+    <!-- ── Loading Animation Screen ── -->
+    <div id="loading-screen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <img src="stock_images/jobsarthi.svg" alt="Job Sarthi Logo">
+            </div>
+            <div class="loader-text-wrap">
+                <span class="loader-text">Job Sarthi</span>
+                <div class="loader-underline"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-layer" id="bgLayer"></div>
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+
+    <div id="sarthiOverlay" aria-modal="true" role="dialog">
+
+        <div id="sarthiGlassBox">
+            <div class="sarthi-gb-intro">
+                <div class="sarthi-gb-badge">✦ AI-Powered</div>
+                <h2 class="sarthi-gb-title">Meet <button id="sarthiTitleLink" class="sarthi-title-link">Sarthi</button>
+                </h2>
+                <p class="sarthi-gb-desc">Your personal career AI — resume analysis, mock interviews, job matching &amp;
+                    skill roadmaps. All in one place.</p>
+            </div>
+            <div class="sarthi-tiles-grid">
+                <div class="sarthi-tile">
+                    <div class="tile-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor"
+                                d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8zm0-4h5v2H8z" />
+                        </svg>
+                    </div>
+                    <div class="tile-label">Resume<br>Analyser</div>
+                </div>
+                <div class="sarthi-tile">
+                    <div class="tile-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor"
+                                d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
+                        </svg>
+                    </div>
+                    <div class="tile-label">Interview<br>Mode</div>
+                </div>
+                <div class="sarthi-tile">
+                    <div class="tile-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor"
+                                d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.25 0 .5-.25.5-.5V6c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5v13.5c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5V6c-.6-.45-1.25-.75-2-1z" />
+                        </svg>
+                    </div>
+                    <div class="tile-label">Career<br>Guide</div>
+                </div>
+                <div class="sarthi-tile">
+                    <div class="tile-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor"
+                                d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z" />
+                        </svg>
+                    </div>
+                    <div class="tile-label">Job<br>Analyser</div>
+                </div>
+            </div>
+            <p class="sarthi-gb-hint">↓ Scroll to explore</p>
+        </div>
+
+        <div id="sarthiOvHeading">SARTHI</div>
+
+        <div id="sarthiGlassInner">
+            <div class="sarthi-cards-col">
+                <div class="feature-card active" data-feature="resume">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8zm0-4h5v2H8z" />
+                        </svg>
+                    </div>
+                    <div class="card-text">
+                        <h3>Resume Analyser</h3>
+                        <p>ATS scoring &amp; feedback</p>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="interview">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
+                        </svg>
+                    </div>
+                    <div class="card-text">
+                        <h3>Interview Mode</h3>
+                        <p>AI mock interviews</p>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="career">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.25 0 .5-.25.5-.5V6c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5v13.5c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5V6c-.6-.45-1.25-.75-2-1z" />
+                        </svg>
+                    </div>
+                    <div class="card-text">
+                        <h3>Career Guide</h3>
+                        <p>Personalized roadmaps</p>
+                    </div>
+                </div>
+                <div class="feature-card" data-feature="job">
+                    <div class="card-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor"
+                                d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z" />
+                        </svg>
+                    </div>
+                    <div class="card-text">
+                        <h3>Job Analyser</h3>
+                        <p>Match skills to roles</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sarthi-display-col">
+                <div class="display-content active" id="display-resume">
+                    <h3>Resume Analyser</h3>
+                    <p>Upload your resume and let Sarthi AI analyse it against real industry standards with instant ATS
+                        scoring.</p>
+                    <ul>
+                        <li>Identify missing keywords for ATS optimization</li>
+                        <li>Actionable formatting suggestions</li>
+                        <li>Compare against specific job descriptions</li>
+                    </ul>
+                    <div class="placeholder-media"><span class="placeholder-text">📄 Resume Analysis Demo</span></div>
+                    <button class="btn-primary" style="align-self:flex-start;margin-top:auto;">Try Analyser →</button>
+                </div>
+                <div class="display-content" id="display-interview">
+                    <h3>Interview Mode</h3>
+                    <p>Practice with our voice-enabled AI interviewer tailored precisely to your target role and
+                        company.</p>
+                    <ul>
+                        <li>Behavioral and technical question sets</li>
+                        <li>Real-time feedback on tone and pacing</li>
+                        <li>Comprehensive post-interview report</li>
+                    </ul>
+                    <div class="placeholder-media"><span class="placeholder-text">🎤 Mock Interview Demo</span></div>
+                    <button class="btn-primary" style="align-self:flex-start;margin-top:auto;">Start Interview
+                        →</button>
+                </div>
+                <div class="display-content" id="display-career">
+                    <h3>Career Guide</h3>
+                    <p>Not sure what to learn next? Get a custom roadmap based on your skills and target role.</p>
+                    <ul>
+                        <li>Step-by-step learning milestones</li>
+                        <li>Curated resources and course links</li>
+                        <li>Track progress with built-in goals</li>
+                    </ul>
+                    <div class="placeholder-media"><span class="placeholder-text">🗺️ Roadmap Demo</span></div>
+                    <button class="btn-primary" style="align-self:flex-start;margin-top:auto;">Build Roadmap →</button>
+                </div>
+                <div class="display-content" id="display-job">
+                    <h3>Job Analyser</h3>
+                    <p>Paste any job description and get an instant skills gap analysis against your profile.</p>
+                    <ul>
+                        <li>Skills match percentage</li>
+                        <li>Missing skills highlighted</li>
+                        <li>Suggested courses to close the gap</li>
+                    </ul>
+                    <div class="placeholder-media"><span class="placeholder-text">💼 Job Match Demo</span></div>
+                    <button class="btn-primary" style="align-self:flex-start;margin-top:auto;">Analyse Job →</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header id="mainHeader" class="landing-header">
+        <div class="header-left">
+            <div class="brand-logo">
+                <img src="stock_images/jobsarthi.svg" alt="Job Sarthi Logo">
+                <span class="brand-text">Job Sarthi</span>
+            </div>
+        </div>
+        <nav class="header-nav">
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M20 6h-4V4c0-1.1-.9-2-2-2h-4c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zM10 4h4v2h-4V4zm10 16H4V8h16v12z" />
+                </svg>
+                <span>Jobs</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2.12-1.15V17h2V8.27L12 3zm6.8 6L12 12.8 5.2 9 12 5.28 18.8 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z" />
+                </svg>
+                <span>Skills</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12 2c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm0 2c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm4 4v2h2v-2h-2zm-10 0v2h2v-2H6zm3 7h6v2H9v-2z" />
+                </svg>
+                <span>Sarthi</span>
+            </a>
+            <a href="#" class="nav-item">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor"
+                        d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z" />
+                </svg>
+                <span>Notifications</span>
+            </a>
+        </nav>
+        <div class="header-right">
+            <button class="icon-btn settings-btn" aria-label="Settings">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                    <path fill="currentColor"
+                        d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" />
+                </svg>
+                <span>Settings</span>
+            </button>
+            <div class="profile-avatar"><span>PJ</span></div>
+        </div>
+    </header>
+
+    <main class="landing-hero">
+        <div class="hero-content animate-on-scroll">
+            <h1 class="hero-title load-anim-1">Your AI-Powered Career Companion</h1>
+            <p class="hero-subtitle load-anim-2">Elevate your journey with Sarthi AI. Discover personalized
+                internships, curated jobs, and precision skill roadmaps tailored for your success.</p>
+            <div class="hero-actions load-anim-3">
+                <button class="btn-landing btn-transparent"
+                    onclick="window.location.href='login_page.html'">Login</button>
+                <button class="btn-landing btn-filled" onclick="window.location.href='login_page.html#create'">Create
+                    Account</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="scrollStage" style="height:300vh;position:relative;pointer-events:none;"></div>
+
+    <div id="sarthiFloatWrap">
+        <span class="sarthi-hint-label">Try our AI chatbot</span>
+        <button class="btn-sarthi" id="sarthiBtn" aria-label="Open Sarthi AI">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor"
+                    d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
+            </svg>
+            <span>SARTHI</span>
+        </button>
+    </div>
+
+    <div style="height: 100vh;"></div>
+
+    <!-- Settings Container (loaded from shared settings.html + settings.js) -->
+    <div id="settingsContainer"></div>
+    <script src="settings.js"></script>
+</body>
+
+</html>

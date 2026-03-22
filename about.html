@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Job Sarthi - Your AI-Powered Career Companion</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script>
+        (function () {
+            const t = localStorage.getItem("website_theme") || "dark";
+            const b = localStorage.getItem("website_bg") || "ocean";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-bg", b);
+
+            // Background flicker prevention (same as index)
+            if (b === "custom") {
+                document.documentElement.classList.add("bg-preparing");
+                const req = indexedDB.open('JobSarthiDB', 1);
+                req.onsuccess = () => {
+                    const db = req.result;
+                    if (db.objectStoreNames.contains('backgrounds')) {
+                        const tx = db.transaction('backgrounds', 'readonly');
+                        const get = tx.objectStore('backgrounds').get('custom_bg');
+                        get.onsuccess = () => {
+                            const blob = get.result;
+                            if (blob instanceof Blob) {
+                                const url = URL.createObjectURL(blob);
+                                document.documentElement.style.setProperty("--custom-bg-image", `url('${url}')`);
+                                setTimeout(() => document.documentElement.classList.remove("bg-preparing"), 50);
+                            } else document.documentElement.classList.remove("bg-preparing");
+                        };
+                    } else document.documentElement.classList.remove("bg-preparing");
+                };
+            }
+        })();
+    </script>
+    <style>
+        .about-main {
+            padding-top: 120px;
+            padding-bottom: 80px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .about-hero {
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .about-hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--text-main) 30%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .about-hero p {
+            font-size: 1.25rem;
+            color: var(--text-dim);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .mission-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+
+        .mission-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .mission-text p {
+            color: var(--text-muted);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .glass-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .feature-item {
+            padding: 2rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-10px);
+            border-color: var(--accent);
+        }
+
+        .f-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 20px rgba(var(--accent-rgb), 0.3);
+        }
+
+        .f-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-main);
+        }
+
+        .f-desc {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .brand-logo {
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .mission-section {
+                grid-template-columns: 1fr;
+            }
+
+            .about-main {
+                padding-top: 100px;
+            }
+        }
+
+        .page-entry-anim {
+            animation: fadeInSimple 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeInSimple {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body class="landing-page-body">
+    <div class="bg-layer" id="bgLayer"></div>
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+
+    <header class="landing-header" style="background: transparent; border: none; box-shadow: none;">
+        <div class="header-left">
+            <div class="brand-logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+                <img src="stock_images/jobsarthi.svg" alt="Job Sarthi Logo">
+                <span class="brand-text">Job Sarthi</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="about-main">
+        <section class="about-hero page-entry-anim">
+            <h1>Empowering Your Career Journey</h1>
+            <p>Job Sarthi is your dedicated AI mentor, bridging the gap between education and employment with
+                cutting-edge technology and personalized guidance.</p>
+        </section>
+
+        <section class="mission-section glass-box page-entry-anim" style="animation-delay: 0.2s;">
+            <div class="mission-text">
+                <h2>Our Mission</h2>
+                <p>In a world of rapidly evolving industries, finding the right path can be overwhelming. Job Sarthi
+                    (meaning "The Charioteer") was born from a simple vision: to ensure no student or professional has
+                    to navigate their career journey alone.</p>
+                <p style="margin-top: 1rem;">We leverage advanced Artificial Intelligence to provide real-time,
+                    actionable insights that help you build a standout profile and land your dream role.</p>
+            </div>
+            <div class="mission-visual" style="display:flex; justify-content:center;">
+                <img src="stock_images/jobsarthi.svg" style="width: 200px; filter: drop-shadow(0 0 30px var(--accent));"
+                    alt="Mission Vision">
+            </div>
+        </section>
+
+        <div class="features-grid page-entry-anim" style="animation-delay: 0.4s;">
+            <div class="feature-item">
+                <div class="f-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                    </svg>
+                </div>
+                <div class="f-title">Resume Intelligence</div>
+                <div class="f-desc">Instant ATS-based scoring and deep feedback to help you beat the algorithms.</div>
+            </div>
+            <div class="feature-item">
+                <div class="f-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" />
+                    </svg>
+                </div>
+                <div class="f-title">Mock Interviews</div>
+                <div class="f-desc">Practice with voice-enabled AI tailored to specific job descriptions and roles.
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="f-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path fill="currentColor"
+                            d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.25 0 .5-.25.5-.5V6c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5v13.5c1.35-.85 3.8-1.5 5.5-1.5 1.7 0 4.15.65 5.5 1.5V6c-.6-.45-1.25-.75-2-1z" />
+                    </svg>
+                </div>
+                <div class="f-title">Skill Roadmaps</div>
+                <div class="f-desc">Personalized learning paths that evolve as you progress in your career journey.
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 4rem;">
+                <button class="btn-landing btn-transparent" onclick="window.location.href='index.html'">← Back to
+                    Home</button>
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.to(".about-hero", { opacity: 1, y: 0, duration: 1, ease: "power2.out" });
+            gsap.to(".mission-section", { opacity: 1, x: 0, duration: 1, delay: 0.3, ease: "power2.out" });
+            gsap.to(".features-grid", { opacity: 1, y: 0, duration: 1, delay: 0.6, ease: "power2.out" });
+        });
+    </script>
+</body>
+
+</html>

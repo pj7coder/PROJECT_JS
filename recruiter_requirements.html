@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiring Requirements</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        (function () {
+            const t = localStorage.getItem("website_theme") || "dark";
+            const b = localStorage.getItem("website_bg") || "ocean";
+            document.documentElement.setAttribute("data-theme", t);
+            document.documentElement.setAttribute("data-bg", b);
+            const cb = localStorage.getItem("website_custom_bg");
+            if (b === "custom" && cb) {
+                document.documentElement.style.setProperty("--custom-bg-image", `url('${cb}')`);
+            }
+        })();
+    </script>
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+    <div class="bg-layer" id="bgLayer"></div>
+
+    <div class="glass-orb orb-1"></div>
+    <div class="glass-orb orb-2"></div>
+
+    <main class="auth-container qual-main-container">
+        <header class="auth-header" style="margin-bottom: 1.5rem;">
+            <h1>Hiring Requirements <span
+                    style="font-weight: 300; font-size: 0.6em; color: var(--text-dim);">(Optional)</span></h1>
+            <p style="color: var(--text-dim); margin-top: 0.5rem;">Tell us what kind of talent you're looking for.</p>
+        </header>
+
+        <div class="auth-card glass qual-card">
+            <div class="qual-scroll-content">
+
+                <div class="step-indicator" id="qualStepIndicator">
+                    <span class="step dot active"></span>
+                    <span class="step line" id="line1"></span>
+                    <span class="step dot" id="dot2"></span>
+                    <span class="step line" id="line2"></span>
+                    <span class="step dot" id="dot3"></span>
+                    <span class="step line" id="line3"></span>
+                    <span class="step dot" id="dot4"></span>
+                    <span class="step line" id="line4"></span>
+                    <span class="step dot final-dot" id="dot5">
+                        <svg viewBox="0 0 24 24" width="12" height="12" class="tick hidden">
+                            <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                        </svg>
+                    </span>
+                </div>
+
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z" />
+                                </svg>
+                                Company Information
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2">
+                                    <label>Company Name</label>
+                                    <input type="text" placeholder="e.g. Acme Corp">
+                                </div>
+                                <div class="input-group">
+                                    <label>Industry Type</label>
+                                    <div class="custom-select" id="industrySelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select Industry">Select
+                                                Industry</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container">
+                                                <input type="text" class="select-search"
+                                                    placeholder="Search industry...">
+                                            </div>
+                                            <div class="select-options-list" data-target="industrySelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="industry_type" id="hiddenIndustryInput">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Company Size</label>
+                                    <div class="custom-select" id="companySizeSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select Size">Select
+                                                Size</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container">
+                                                <input type="text" class="select-search" placeholder="Search size...">
+                                            </div>
+                                            <div class="select-options-list" data-target="companySizeSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="company_size" id="hiddenSizeInput">
+                                    </div>
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Location</label>
+                                    <input type="text" placeholder="e.g. Bangalore, India">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Company Website</label>
+                                    <input type="url" placeholder="https://">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                </svg>
+                                Hiring Requirements
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2">
+                                    <label>Role Needed <span class="helper-text">- e.g. Software Developer,
+                                            HR</span></label>
+                                    <input type="text" placeholder="Enter role">
+                                </div>
+                                <div class="input-group">
+                                    <label>Employment Type</label>
+                                    <div class="custom-select" id="employmentTypeSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select option">Select
+                                                option</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container">
+                                                <input type="text" class="select-search" placeholder="Search type...">
+                                            </div>
+                                            <div class="select-options-list" data-target="employmentTypeSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="employment_type" id="hiddenEmpTypeInput">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Experience Level</label>
+                                    <div class="custom-select" id="experienceLevelSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select level">Select
+                                                level</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container">
+                                                <input type="text" class="select-search" placeholder="Search level...">
+                                            </div>
+                                            <div class="select-options-list" data-target="experienceLevelSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="experience_level" id="hiddenExpLevelInput">
+                                    </div>
+                                </div>
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Required Skills <span class="helper-text">- e.g. React,
+                                            Node.js</span></label>
+                                    <input type="text" placeholder="Start typing to add skills...">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Education Preference <span class="helper-text">- Optional</span></label>
+                                    <input type="text" placeholder="e.g. B.Tech CS, MBA">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Salary Range <span class="helper-text">- Optional</span></label>
+                                    <input type="text" placeholder="e.g. $50k - $70k / ₹5L - ₹8L">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                                </svg>
+                                Job Details
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2">
+                                    <label>Job Description</label>
+                                    <textarea placeholder="Briefly describe the job" rows="3"
+                                        class="char-limited-textarea"></textarea>
+                                    <div class="char-count">0 / 300</div>
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Responsibilities</label>
+                                    <textarea placeholder="Key responsibilities" rows="3"
+                                        class="char-limited-textarea"></textarea>
+                                    <div class="char-count">0 / 300</div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Work Mode</label>
+                                    <div class="custom-select" id="workModeSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select mode">Select
+                                                mode</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container">
+                                                <input type="text" class="select-search" placeholder="Search mode...">
+                                            </div>
+                                            <div class="select-options-list" data-target="workModeSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="work_mode" id="hiddenWorkModeInput">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Number of Positions</label>
+                                    <input type="number" placeholder="e.g. 5" min="1">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Joining Timeline</label>
+                                    <input type="text" placeholder="e.g. Immediately, 30 days">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item">
+                        <button class="accordion-header" type="button" aria-expanded="false">
+                            <div class="acc-title">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor"
+                                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                                </svg>
+                                Candidate Preferences
+                            </div>
+                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                            </svg>
+                        </button>
+                        <div class="accordion-body">
+                            <div class="accordion-grid">
+                                <div class="input-group span-2 floating-wrapper">
+                                    <label>Preferred Location</label>
+                                    <input type="text" placeholder="e.g. Bangalore, Delhi NCR">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Languages Required</label>
+                                    <input type="text" placeholder="e.g. English, Hindi">
+                                </div>
+                                <div class="input-group span-2">
+                                    <label>Certifications Required <span class="helper-text">- Optional</span></label>
+                                    <input type="text" placeholder="e.g. AWS Certified, PMP">
+                                </div>
+                                <div class="input-group">
+                                    <label>Portfolio Required</label>
+                                    <div class="custom-select" id="portfolioSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select option">Select
+                                                option</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container" style="display: none;">
+                                                <input type="text" class="select-search" placeholder="Search...">
+                                            </div>
+                                            <div class="select-options-list" data-target="portfolioSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="portfolio_req" id="hiddenPortReqInput">
+                                    </div>
+                                </div>
+                                <div class="input-group">
+                                    <label>Immediate Joiner Preferred</label>
+                                    <div class="custom-select" id="immediateJoinerSelect">
+                                        <div class="select-selected">
+                                            <span class="selected-text" data-placeholder="Select option">Select
+                                                option</span>
+                                            <svg class="chevron" viewBox="0 0 24 24" width="18" height="18">
+                                                <path fill="currentColor" d="M7 10l5 5 5-5z" />
+                                            </svg>
+                                        </div>
+                                        <div class="select-items-container">
+                                            <div class="select-search-container" style="display: none;">
+                                                <input type="text" class="select-search" placeholder="Search...">
+                                            </div>
+                                            <div class="select-options-list" data-target="immediateJoinerSelect">
+                                            </div>
+                                        </div>
+                                        <input type="hidden" name="immediate_join" id="hiddenImedJoinInput">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <div class="qual-action-buttons">
+                    <button type="button" class="btn-secondary" id="skipBtn"
+                        onclick="window.location.href='index.html'">Skip for Now</button>
+                    <button type="button" class="btn-primary" id="saveQualBtn"
+                        onclick="window.location.href='index.html'">Save & Continue</button>
+                </div>
+            </div>
+
+        </div>
+        </div>
+    </main>
+</body>
+
+</html>
